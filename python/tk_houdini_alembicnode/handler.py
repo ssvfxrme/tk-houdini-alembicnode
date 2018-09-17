@@ -385,7 +385,7 @@ class TkAlembicNodeHandler(object):
 
         output_profile = self._get_output_profile(node)
 
-        self._app.log_debug("Applying tk alembic node profile: %s" % 
+        self._app.log_debug("Applying tk Alembic node profile: %s" % 
             (output_profile["name"],))
 
         # apply the supplied settings to the node
@@ -505,21 +505,48 @@ class TkAlembicNodeHandler(object):
 
         # get the Step name field for the templated Mantra Output
         step_name = ""
+        entity_name = ""
+        asset_type = ""
+
         try:
             ctx = self._app.context
             step_name = ctx.step['name']
+            entity_name = ctx.entity['name']
+            entity_type = ctx.entity['type']
         except:
             self._app.log_debug("Could not find the Shotgun context Step name.")
 
         # create fields dict with all the metadata
-        fields = {
-            "name": work_file_fields.get("name", None),
-            "node": node.name(),
-            "renderpass": node.name(),
-            "SEQ": "FORMAT: $F",
-            "version": work_file_fields.get("version", None),
-            "Step": step_name,
-        }
+        fields={}
+
+        # Shot Template fields
+        if entity_type == "Shot":
+            fields = {
+                "name": work_file_fields.get("name", None),
+                "node": node.name(),
+                "renderpass": node.name(),
+                "HSEQ": "FORMAT: $F",
+                "version": work_file_fields.get("version", None),
+                "Shot": entity_name,
+                "Step": step_name
+            }
+
+        # Asset Template fields
+        if entity_type == "Asset":
+            # Set the Asset Type
+            asset_type = work_file_fields.get("sg_asset_type", None)
+
+            fields = {
+                "name": work_file_fields.get("name", None),
+                "node": node.name(),
+                "renderpass": node.name(),
+                "HSEQ": "FORMAT: $F",
+                "version": work_file_fields.get("version", None),
+                "Asset": entity_name,
+                "sg_asset_type": asset_type,
+                "Step": step_name
+            }
+
 
         fields.update(self._app.context.as_template_fields(
             output_cache_template))
