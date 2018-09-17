@@ -504,13 +504,11 @@ class TkAlembicNodeHandler(object):
             output_profile["output_cache_template"])
 
         # get the Step name field for the templated Mantra Output
-        step_name = ""
         entity_name = ""
         asset_type = ""
 
         try:
             ctx = self._app.context
-            step_name = ctx.step['name']
             entity_name = ctx.entity['name']
             entity_type = ctx.entity['type']
         except:
@@ -528,12 +526,12 @@ class TkAlembicNodeHandler(object):
                 "HSEQ": "FORMAT: $F",
                 "version": work_file_fields.get("version", None),
                 "Shot": entity_name,
-                "Step": step_name
+                "Step": work_file_fields.get("Step", None)
             }
 
         # Asset Template fields
         if entity_type == "Asset":
-            # Set the Asset Type
+            # Set the Custom Asset Type
             asset_type = work_file_fields.get("sg_asset_type", None)
 
             fields = {
@@ -544,7 +542,7 @@ class TkAlembicNodeHandler(object):
                 "version": work_file_fields.get("version", None),
                 "Asset": entity_name,
                 "sg_asset_type": asset_type,
-                "Step": step_name
+                "Step": work_file_fields.get("Step", None)
             }
 
 
